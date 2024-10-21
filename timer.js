@@ -30,26 +30,28 @@ function startTimer(duration) {
         if (timeLeft <= 0) {
             clearInterval(timerId); // Detener el temporizador
             timerDisplay.textContent = "¡Tiempo!";
-            // No cambiar de imagen automáticamente
+            // Mostramos el nombre del actor después del tiempo sin avanzar la diapositiva
+            slides[currentIndex].classList.add('active'); // Mostrar el nombre del actor
         }
     }, 1000); // Actualiza cada segundo
 }
 
 // Función para mostrar una diapositiva
 function showSlide(index) {
+    // Ocultar la diapositiva actual
     slides[currentIndex].style.display = 'none';
-    slides[currentIndex].classList.remove('active');
+    slides[currentIndex].classList.remove('active'); // Ocultar el nombre del actor
 
+    // Cambiar al nuevo índice
     currentIndex = index;
 
+    // Mostrar la nueva diapositiva
     slides[currentIndex].style.display = 'block';
     clearTimeout(timeoutId);
     clearInterval(timerId); // Detener el temporizador anterior
     startTimer(7); // Inicia el temporizador de 7 segundos
 
-    timeoutId = setTimeout(() => {
-        slides[currentIndex].classList.add('active');
-    }, 7000); // 7 segundos para mostrar el nombre
+    // No avanzar a la siguiente diapositiva automáticamente
 }
 
 // Mezclar las diapositivas al cargar la página
