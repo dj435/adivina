@@ -30,7 +30,7 @@ function startTimer(duration) {
         if (timeLeft <= 0) {
             clearInterval(timerId); // Detener el temporizador
             timerDisplay.textContent = "¡Tiempo!";
-            nextSlide(); // Ir a la siguiente diapositiva automáticamente
+            // No cambiar de imagen automáticamente
         }
     }, 1000); // Actualiza cada segundo
 }
