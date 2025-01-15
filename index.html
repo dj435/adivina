@@ -1,56 +1,126 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="index.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACTORES</title>
+    <meta charset="utf-8" />
+    <title>Player Multi-Enlace YouTube y M3U8</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .contenedor {
+            height: 100%;
+            width: 100%;
+        }
+        #player {
+            height: 92.5%;
+            width: 100%;
+        }
+        #controls {
+            height: 8.5%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgb(0 0 255);
+        }
+        #controls button, #current-title {
+            margin: 0 15px;
+            padding: 2px;
+            font-size: 20px;
+            border: 1px solid black;
+            border-radius: 5px;
+            background: white;
+            cursor: default;
+        }
+        #controls button:hover, #current-title:hover {
+            border: 2px solid red;
+        }
+        #controls button {
+            cursor: pointer;
+        }
+    </style>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
 </head>
 <body>
-
-<!-- Controles de la presentación de diapositivas -->
-<div class="slideshow-controls">
-    <!-- Botón "Siguiente" con el id "nextButton" -->
-    <button id="nextButton" onclick="nextSlide()">Siguiente</button>
-</div>
-
-<!-- Contenedor de la presentación de diapositivas -->
-<div class="slideshow-container">
-    <div class="slide">
-        <img src="caras/anya.jpg" alt="Anya Taylor-Joy">
-        <div class="slide-title">ANYA TAYLOR-JOY</div>
+    <div class="contenedor">
+        <div id="player">
+            <!-- Aquí vamos a insertar dinámicamente el reproductor adecuado -->
+        </div>
+        <div id="controls">
+            <button id="prev">◀◀</button>
+            <div id="current-title">Video</div>
+            <button id="next">▶▶</button>
+        </div>
     </div>
 
-    <div class="slide">
-        <img src="caras/russell.jpg" alt="Russell Crowe">
-        <div class="slide-title">RUSSELL CROWE</div>
-    </div>
+    <script>
+        // Lista de enlaces que contiene tanto YouTube como M3U8
+        const links = [
+            { title: "YouTube Video 1", type: "youtube", url: "QGpHLgRnrx4" }, // Video de YouTube
+            { title: "Canal 7 M3U8", type: "m3u8", url: "https://stream.arcast.com.ar/c7nq/ngrp:c7nq_all/playlist.m3u8" }, // M3U8 Video
+            { title: "YouTube Video 2", type: "youtube", url: "QGpHLgRnrx4" }, // Video de YouTube
+            { title: "El Garage M3U8", type: "m3u8", url: "https://stream1.sersat.com/hls/garagetv.m3u8" }  // M3U8 Video
+        ];
 
-    <div class="slide">
-        <img src="caras/emma.jpg" alt="Emma Stone">
-        <div class="slide-title">EMMA STONE</div>
-    </div>
+        // Índice del enlace actual
+        let currentIndex = 0;
 
-    <div class="slide">
-        <img src="caras/johnny.jpg" alt="Johnny Depp">
-        <div class="slide-title">JOHNNY DEPP</div>
-    </div>
+        // Referencias a los controles
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+        const currentTitle = document.getElementById('current-title');
+        const playerDiv = document.getElementById('player');
 
-    <div class="slide">
-        <img src="caras/harrison.jpg" alt="Harrison Ford">
-        <div class="slide-title">HARRISON FORD</div>
-    </div>
-</div>
+        // Inicializar el reproductor
+        let player;
 
-<!-- Temporizador -->
-<div class="timer" id="timer">7</div>
+        // Función para actualizar el reproductor
+        function updatePlayer(index) {
+            currentIndex = index;
+            currentTitle.textContent = links[currentIndex].title; // Actualizamos el título
 
-<!-- Archivo JavaScript -->
-<script src="timer.js"></script>
+            // Limpiamos el reproductor actual
+            playerDiv.innerHTML = "";
 
-<div class="header">
-    <h1>QUIEN ES?</h1>
-</div>
+            if (links[currentIndex].type === "youtube") {
+                // Si el enlace es de YouTube, usamos un iframe
+                playerDiv.innerHTML = `<iframe id="youtube-player" width="100%" height="100%" src="https://www.youtube.com/embed/${links[currentIndex].url}?autoplay=1&mute=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            } else if (links[currentIndex].type === "m3u8") {
+                // Si el enlace es de tipo M3U8, usamos Clappr
+                player = new Clappr.Player({
+                    source: links[currentIndex].url,
+                    title: links[currentIndex].title,
+                    height: "100%",
+                    width: "100%",
+                    parentId: "#player",
+                    autoPlay: true,
+                    mute: false
+                });
+            }
+        }
 
+        // Cargar el primer video
+        updatePlayer(currentIndex);
+
+        // Evento para el botón "Anterior"
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                updatePlayer(currentIndex - 1);
+            } else {
+                updatePlayer(links.length - 1); // Volver al último si estamos en el primero
+            }
+        });
+
+        // Evento para el botón "Siguiente"
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < links.length - 1) {
+                updatePlayer(currentIndex + 1);
+            } else {
+                updatePlayer(0); // Volver al primero si estamos en el último
+            }
+        });
+    </script>
 </body>
 </html>
